@@ -29,7 +29,7 @@ main features:
 
 
 todo:
-- create  routing-policies
+- create routing-policies
 - 'sync=True' option will allow to remove elements on Apstra which are not defined in YAML file
 - 'sync=True' will not remove elements from Apstra server (tagged as 'protect' will be keep on apstra side)
 - add option -commit for script which will Commit Configuration only if blueprint not repors any errors

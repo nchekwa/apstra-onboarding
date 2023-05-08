@@ -23,7 +23,7 @@ def get_as_list(string: str) -> List[str]:
 
 def sort_fields(data: dict, config_section_name: str = "global") -> Dict:
     field_names_dict = {
-        "virtual-networks": ['name', 'routing-zone', 'vlan_id', 'vn_id', 'ipv4_enabled', 'ipv4_subnet', 'virtual_gateway_ipv4'],
+        "virtual-networks": ['name', 'routing_zone', 'vlan_id', 'vn_id', 'ipv4_enabled', 'ipv4_subnet', 'virtual_gateway_ipv4'],
         "routing-zones": ['name', 'vlan_id', 'ipv4_subnet'],
         "global": ['aos', 'resource', 'blueprints'],
     }
