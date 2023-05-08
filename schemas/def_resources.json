@@ -1,0 +1,125 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "title": "Resources",
+    "definitions": {
+        "Resources": {
+            "type": "object",
+            "properties": {
+                "asn-pools": {
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "$ref": "#/definitions/ASNPool"
+                    }
+                },
+                "ip-pools": {
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "$ref": "#/definitions/IPv4Pool"
+                    }
+                },
+                "vni-pools": {
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "$ref": "#/definitions/VNIPool"
+                    }
+                }
+            },
+            "additionalProperties": false
+        },
+        "IPv4Pool": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "apstra": {
+                    "type": "string"
+                },
+                "subnets": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "pattern": "^(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\/(0|[1-9]|[12][0-9]|3[0-2])$"
+                    }
+                },
+                "tags": {
+                    "type": "array",
+                    "additionalItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "name",
+                "apstra"
+            ]
+        },
+        "VNIPool": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "apstra": {
+                    "type": "string"
+                },
+                "ranges": {
+                    "type": "array",
+                    "additionalItems": true,
+                    "items": {
+                        "type": "string",
+                        "description": "pattern match VXLAN range 0 through 16777215",
+                        "pattern": "^(?:0*(?:(?:1?\\d|2[0-5]{1,2}){1,3}|1677721[0-5]|167772[0-1]\\d|16777[0-1]\\d{2}|1677[0-6]\\d{3}|167[0-6]\\d{4}|16[0-6]\\d{5}|1[0-5]\\d{6}|[1-9]\\d{0,5}))\\s*(?:-|to)\\s*(?:0*(?:(?:1?\\d|2[0-5]{1,2}){1,3}|1677721[0-5]|167772[0-1]\\d|16777[0-1]\\d{2}|1677[0-6]\\d{3}|167[0-6]\\d{4}|16[0-6]\\d{5}|1[0-5]\\d{6}|[1-9]\\d{0,5}))$"
+                    }
+                },
+                "tags": {
+                    "type": "array",
+                    "additionalItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "name",
+                "apstra"
+            ]
+        },
+        "ASNPool": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "apstra": {
+                    "type": "string"
+                },
+                "ranges": {
+                    "type": "array",
+                    "additionalItems": true,
+                    "items": {
+                        "type": "string",
+                        "description": "Validate Pattern: ASNs (1 to 4294967295).",
+                        "pattern": "^(?:[1-9]\\d{0,8}|1\\d{0,8}\\d|2[0-9]{0,8}[0-9]|[3-4][0-2]{0,8}[0-9]{0,7}|429496729[0-5])(?:\\s*-\\s*|\\s*to\\s*)(?:[1-9]\\d{0,8}|1\\d{0,8}\\d|2[0-9]{0,8}[0-9]|[3-4][0-2]{0,8}[0-9]{0,7}|429496729[0-5])$"
+                    }
+                },
+                "tags": {
+                    "type": "array",
+                    "additionalItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "additionalProperties": false
+}

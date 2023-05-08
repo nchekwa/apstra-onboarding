@@ -1,0 +1,81 @@
+aos:
+  ApstraServer:
+    host: 10.10.10.8
+    username: admin
+    password: admin
+    blueprints:
+    - LeftDC1
+    - RightDC2
+resource:
+  ip-pools:
+  - name: VRF-COCACOLA-Loopbacks
+    apstra: ApstraServer
+    subnets:
+    - 10.128.0.0/24
+  - name: VRF-PEPSI-Loopbacks2
+    apstra: ApstraServer
+    subnets:
+    - 10.128.1.0/24
+  vni-pools:
+  - name: MYVNI-Pool1
+    apstra: ApstraServer
+    ranges:
+    - 10000-20000
+    - 20200-20300
+  asn-pools:
+  - name: MyASN-Pool
+    apstra: ApstraServer
+    ranges:
+    - 65000-65100
+blueprints:
+  LeftDC1:
+    routing-zones:
+    - name: COCA-COLA
+      vlan_id: 100
+      vni_id: 100100
+      leaf_loopback_ip_pools:
+      - VRF-COCACOLA-Loopbacks
+      dhcp_servers:
+      - 192.168.1.1
+      - 192.168.1.2
+    - name: PEPSI
+      vlan_id: 200
+      vni_id: 100200
+      leaf_loopback_ip_pools:
+      - VRF-PEPSI-Loopbacks2
+    virtual-networks:
+    - name: COLA-VLAN1000
+      routing-zone: COCA-COLA
+      vlan_id: 1000
+      vn_id: 1001000
+      ipv4_enabled: false
+      bound_to:
+      - system: Leaf1
+    - name: PEPSI-VLAN2000
+      routing-zone: PEPSI
+      vlan_id: 2000
+      vn_id: 1002000
+      ipv4_enabled: true
+      ipv4_subnet: 192.168.1.0/24
+      virtual_gateway_ipv4: 192.168.1.1
+      bound_to:
+      - system: Leaf1
+      - system: Leaf2
+  RightDC2:
+    routing-zones:
+    - name: COCA-COLA
+      vlan_id: 100
+      vni_id: 100100
+      leaf_loopback_ip_pools:
+      - VRF-COCACOLA-Loopbacks
+      dhcp_servers:
+      - 192.168.1.1
+      - 192.168.1.2
+    virtual-networks:
+    - name: COLA-VLAN1000
+      routing-zone: COCA-COLA
+      vlan_id: 1000
+      vn_id: 1001000
+      ipv4_enabled: false
+      bound_to:
+      - system: Leaf1

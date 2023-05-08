@@ -1,0 +1,93 @@
+virtual-networks: &virtual-networks
+  - name: COCA-COLA_LAN111
+    routing_zone: COCA-COLA
+    vlan_id: 111
+    vn_id: 30111
+    ipv4_enabled: True
+    ipv4_subnet: 192.168.111.0/24
+    virtual_gateway_ipv4: 192.168.111.1
+    bound_to:
+    - system: esi_vex_full_001_leaf_pair1
+  - name: COCA-COLA_LAN112
+    routing_zone: COCA-COLA
+    vn_id: 30112
+    ipv4_enabled: False
+    bound_to:
+    - system: Leaf1
+      vlan_id: 112
+    - system: Leaf2
+      vlan_id: 112
+    - system: Leaf33
+      vlan_id: 112
+  - name: COCA-COLA_LAN113
+    routing_zone: COCA-COLA
+    vn_id: 30113
+    vlan_id: 113
+    ipv4_enabled: False
+    bound_to:
+    - system: Leaf1
+      vlan_id: 113
+    - system: Leaf2
+  - name: COCA-COLA_LAN114
+    routing_zone: COCA-COLA
+    vn_id: 30114
+    vlan_id: 114
+    ipv4_enabled: False
+    bound_to:
+    - system: Leaf1
+  - name: COCA-COLA_LAN115
+    routing_zone: COCA-COLA
+    vn_id: 30115
+    vlan_id: 115
+    ipv4_enabled: False
+    bound_to:
+    - system: Leaf1
+    - system: Leaf2
+    - system: SLeaf1
+    - system: SLeaf2
+  - name: PEPSI_LAN121
+    routing_zone: PEPSI
+    vlan_id: 121
+    vn_id: 30121
+    ipv4_enabled: True
+    ipv4_subnet: 192.168.121.0/24
+    virtual_gateway_ipv4: 192.168.121.1
+    bound_to:
+    - system: esi_vex_full_001_leaf_pair1
+  - name: PEPSI_LAN122
+    routing_zone: PEPSI
+    vn_id: 30122
+    ipv4_enabled: False
+    bound_to:
+    - system: Leaf1
+      vlan_id: 122
+    - system: Leaf2
+      vlan_id: 122
+    - system: Leaf33
+      vlan_id: 122
+  - name: PEPSI_LAN123
+    routing_zone: PEPSI
+    vn_id: 30123
+    vlan_id: 123
+    ipv4_enabled: False
+    bound_to:
+    - system: Leaf1
+      vlan_id: 123
+    - system: Leaf2
+  - name: PEPSI_LAN124
+    routing_zone: PEPSI
+    vn_id: 30124
+    vlan_id: 124
+    ipv4_enabled: False
+    bound_to:
+    - system: Leaf1
+  - name: PEPSI_LAN125
+    routing_zone: PEPSI
+    vn_id: 30125
+    vlan_id: 125
+    ipv4_enabled: False
+    bound_to:
+    - system: Leaf1
+    - system: Leaf2
+    - system: SLeaf1
+    - system: SLeaf2

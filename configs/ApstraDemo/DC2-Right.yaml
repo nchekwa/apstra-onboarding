@@ -1,0 +1,13 @@
+blueprints:
+  vEX Right:
+    apstra: ApstraLAB
+    sync: True
+    parameters:
+      routing-zone:
+        vni_addend: 1000000
+    routing-zones:
+      *routing-zones
+    virtual-networks:
+      *virtual-networks
+    nodes:
+      *dc2_nodes

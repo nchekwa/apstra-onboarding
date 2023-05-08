@@ -1,0 +1,57 @@
+nodes: &dc2_nodes
+  - name: Server1
+    external: false
+    links:
+    - ifname: eth0
+      switch: Leaf1
+      switch_port: ge-0/0/0
+    - ifname: eth1
+      switch: Leaf2
+      switch_port: ge-0/0/0  
+    - ifname: eth2
+      switch: Leaf1
+      switch_port: ge-0/0/1
+      lag: lag0
+    - ifname: eth3
+      switch: Leaf2
+      switch_port: ge-0/0/1 
+      lag: lag0 
+
+  - name: Server2
+    external: false
+    links:
+    - ifname: eth0
+      switch: Leaf1
+      switch_port: ge-0/0/3
+    - ifname: eth1
+      switch: Leaf2
+      switch_port: ge-0/0/3  
+    - ifname: eth2
+      switch: Leaf1
+      switch_port: ge-0/0/4
+      lag: lag0
+    - ifname: eth3
+      switch: Leaf2
+      switch_port: ge-0/0/4 
+      lag: lag0 
+
+
+  - name: Server3
+    external: false
+    tags: 
+      - tag_server3
+    links:
+    - ifname: eth0
+      switch: Leaf1
+      switch_port: ge-0/0/5
+    - ifname: eth1
+      switch: Leaf2
+      switch_port: ge-0/0/5  
+    - ifname: eth2
+      switch: Leaf1
+      switch_port: xe-0/3/0
+      lag: lag0
+    - ifname: eth3
+      switch: Leaf2
+      switch_port: xe-0/3/0
+      lag: lag0 

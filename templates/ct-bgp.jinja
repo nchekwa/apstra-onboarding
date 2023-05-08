@@ -1,0 +1,136 @@
+{% macro random_string(len) -%}{% for i in range(0,len) -%}{{ [0,1,2,3,4,5,6,7,8,9,"a","b","c","d","e","f"]|random }}{% endfor %}{%- endmacro -%}
+{% macro random_uuid4() -%} {{ random_string(8) + "-" + random_string(4) + "-" + random_string(4) + "-" + random_string(4) + "-" + random_string(12) }}{%- endmacro -%}
+
+{%- set uuid_ct = random_uuid4() %}
+{%- set uuid_ip_link = random_uuid4() %}
+{%- set uuid_ip_link_pipeline = random_uuid4() %}
+{%- set uuid_ip_link_batch = random_uuid4() %}
+
+{%- set uuid_bgp_peering = random_uuid4() %}
+{%- set uuid_bgp_peering_pipeline = random_uuid4() %}
+{%- set uuid_bgp_peering_batch = random_uuid4() %}
+
+{%- set uuid_routing_policy = random_uuid4() %}
+{%- set uuid_routing_policy_pipeline = random_uuid4() %}
+{%- set uuid_routing_policy_batch = random_uuid4() %}
+
+{
+    "policies": [
+      {
+        "description": "{{description or ''}}",
+        "tags": {{ tags|tojson or [] }},
+        "user_data": "{\"isSausage\":true,\"positions\":{\"{{ uuid_ip_link }}\":[290,80,1],\"{{ uuid_bgp_peering }}\":[290,150,2],\"{{ uuid_routing_policy }}\":[290,220,3]}}",
+        "label": "{{label or 'PythonCT'}}",
+        "visible": true,
+        "policy_type_name": "batch",
+        "attributes": {
+          "subpolicies": [
+            "{{ uuid_ip_link_pipeline }}"
+          ]
+        },
+        "id": "{{ id or uuid_ct }}"
+      },
+      {
+        "description": "Build an IP link between a fabric node and a generic system. This primitive uses AOS resource pool \"Link IPs - To Generic\" by default to dynamically allocate an IP endpoint (/31) on each side of the link. To allocate different IP endpoints, navigate under Routing Zone>Subinterfaces Table.",
+        "label": "IP Link",
+        "visible": false,
+        "attributes": {
+          "security_zone": {{ ip_link.security_zone|tojson }} ,
+          "interface_type": {{ ip_link.interface_type|default("untagged", true)|tojson }},
+          "ipv6_addressing_type": {{ ip_link.ipv6_addressing_type|default("none", true)|tojson}},
+          "vlan_id": {{ ip_link.vlan_id|default("null", true) }},
+          "ipv4_addressing_type": {{ ip_link.ipv4_addressing_type|default("numbered", true)|tojson }}
+        },
+        "policy_type_name": "AttachLogicalLink",
+        "id": "{{ uuid_ip_link }}"
+      },
+      {
+        "description": "Build an IP link between a fabric node and a generic system. This primitive uses AOS resource pool \"Link IPs - To Generic\" by default to dynamically allocate an IP endpoint (/31) on each side of the link. To allocate different IP endpoints, navigate under Routing Zone>Subinterfaces Table.",
+        "label": "IP Link (pipeline)",
+        "visible": false,
+        "attributes": {
+          "second_subpolicy": "{{ uuid_ip_link_batch }}",
+          "first_subpolicy": "{{ uuid_ip_link }}"
+        },
+        "policy_type_name": "pipeline",
+        "id": "{{ uuid_ip_link_pipeline }}"
+      },
+      {
+        "description": "Build an IP link between a fabric node and a generic system. This primitive uses AOS resource pool \"Link IPs - To Generic\" by default to dynamically allocate an IP endpoint (/31) on each side of the link. To allocate different IP endpoints, navigate under Routing Zone>Subinterfaces Table.",
+        "label": "IP Link (batch)",
+        "visible": false,
+        "attributes": {
+          "subpolicies": [
+            "{{ uuid_bgp_peering_pipeline }}"
+          ]
+        },
+        "policy_type_name": "batch",
+        "id": "{{ uuid_ip_link_batch }}"
+      },
+      {
+        "description": "Create a BGP peering session with Generic Systems inherited from AOS Generic System properties such as loopback and ASN (addressed, or link-local peer).",
+        "label": "BGP Peering (Generic System)",
+        "visible": false,
+        "attributes": {
+          "session_addressing_ipv6": {{ bgp.session_addressing_ipv6|default("none", true)|tojson }},
+          "peer_from": {{ bgp.peer_from|default("loopback", true)|tojson }},
+          "bfd": {{ bgp.bfd|lower|default('false') }},
+          "password": {{ bgp.password|default("null", true)|tojson }},
+          "keepalive_timer": {{ bgp.keepalive_timer|default(10, true) }},
+          "ipv4_safi": {{ bgp.ipv4_safi|lower|default('true', true) }},
+          "peer_to": {{ bgp.peer_to|default("loopback", true)|tojson }},
+          "session_addressing_ipv4": {{ bgp.session_addressing_ipv4|default("addressed", true)|tojson }},
+          "holdtime_timer": {{ bgp.holdtime_timer|default(30, true) }},
+          "ttl": {{ bgp.ttl|default(2, true) }},
+          "ipv6_safi": {{ bgp.ipv6_safi|lower|default('false', true) }},
+          "neighbor_asn_type": {{ bgp.neighbor_asn_type|default("static", true)|tojson }}
+        },
+        "policy_type_name": "AttachBgpOverSubinterfacesOrSvi",
+        "id": "{{ uuid_bgp_peering }}"
+      },
+      {
+        "description": "Create a BGP peering session with Generic Systems inherited from AOS Generic System properties such as loopback and ASN (addressed, or link-local peer).",
+        "label": "BGP Peering (Generic System) (pipeline)",
+        "visible": false,
+        "attributes": {
+          "second_subpolicy": "{{ uuid_bgp_peering_batch }}",
+          "first_subpolicy": "{{ uuid_bgp_peering }}"
+        },
+        "policy_type_name": "pipeline",
+        "id": "{{ uuid_bgp_peering_pipeline }}"
+      },
+      {
+        "description": "Create a BGP peering session with Generic Systems inherited from AOS Generic System properties such as loopback and ASN (addressed, or link-local peer).",
+        "label": "BGP Peering (Generic System) (batch)",
+        "visible": false,
+        "attributes": {
+          "subpolicies": [
+            "{{ uuid_routing_policy_pipeline }}"
+          ]
+        },
+        "policy_type_name": "batch",
+        "id": "{{ uuid_bgp_peering_batch }}"
+      },
+      {
+        "description": "Allocate routing policy to specific BGP sessions.",
+        "label": "Routing Policy",
+        "visible": false,
+        "attributes": {
+          "rp_to_attach": {{ routing_policy.rp_to_attach|tojson }}
+        },
+        "policy_type_name": "AttachExistingRoutingPolicy",
+        "id": "{{ uuid_routing_policy }}"
+      },
+      {
+        "description": "Allocate routing policy to specific BGP sessions.",
+        "label": "Routing Policy (pipeline)",
+        "visible": false,
+        "attributes": {
+          "second_subpolicy": null,
+          "first_subpolicy": "{{ uuid_routing_policy }}"
+        },
+        "policy_type_name": "pipeline",
+        "id": "{{ uuid_routing_policy_pipeline }}"
+      }
+    ]
+  }

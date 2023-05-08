@@ -1,0 +1,80 @@
+aos:
+  ApstraLAB:
+    host: 10.10.10.8
+    username: admin
+    password: admin
+    port: 443
+    blueprints:
+      - BP1
+      - BP2
+
+blueprints:
+  vEX Right:
+    apstra: ApstraLAB
+    sync: True
+    parameters:
+      routing-zone:
+        vni_addend: 100000
+    routing-zones:
+      - name: PEPSI
+        vlan_id: 1010
+        vni_id: 201010
+        leaf_loopback_ip_pools:
+        - MyLoopbacks
+      - name: COCA-COLA
+        vlan_id: 1011
+        vni_id: 201011
+        leaf_loopback_ip_pools:
+        - MyLoopbacks
+      
+    virtual-networks:
+      - name: VN1
+        routing_zone: PEPSI
+        vlan_id: 300
+        vn_id: 30000
+        ipv4_enabled: True
+        ipv4_subnet: 192.168.77.0/24
+        virtual_gateway_ipv4: 192.168.77.1
+        bound_to:
+          - system: Leaf1
+            vlan_id: 1030
+          - system: Leaf2
+            vlan_id: 1030
+      - name: VN2
+        routing_zone: PEPSI
+        vlan_id: 302
+        vn_id: 30002
+        ipv4_enabled: False
+        bound_to:
+          - system: Leaf1
+            vlan_id: 1030
+          - system: Leaf2
+            vlan_id: 1030
+
+
+resource:
+  ip-pools:
+    - name: DEMO1-IP-Loopbacks
+      apstra: ApstraLAB
+      tags: [TAG1, TAG2]
+      subnets: 
+      - 192.168.88.0/24
+
+  vni-pools:
+    - name: DEMO1-VNI-pools
+      apstra: ApstraLAB
+      ranges: 
+      - 44 - 88
+      - 4096-4098
+      - 4096 to 5097
+      - 10000 to 10010
+
+
+  asn-pools:
+    - name: DEMO1-VNI-pools
+      apstra: ApstraLAB
+      ranges: 
+      - 44 - 88
+      - 4096-4098
+      - 4096 to 5097
+      - 10000 to 10010

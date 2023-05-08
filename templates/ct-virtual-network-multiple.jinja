@@ -1,0 +1,39 @@
+{% macro random_string(len) -%}{% for i in range(0,len) -%}{{ [0,1,2,3,4,5,6,7,8,9,"a","b","c","d","e","f"]|random }}{% endfor %}{%- endmacro -%}
+{% macro random_uuid4() -%} {{ random_string(8) + "-" + random_string(4) + "-" + random_string(4) + "-" + random_string(4) + "-" + random_string(12) }}{%- endmacro -%}
+
+{%- set uuid_ct_batch = random_uuid4() %}
+{%- set uuid_AttachMultipleVLAN = random_uuid4() %}
+{%- set uuid_AttachMultipleVLAN_pipeline = random_uuid4() %}
+
+{% set label = label|default(name) %}
+
+{
+"policies": [
+  {
+    "description": "{{ description }}",
+    "tags": [{{ tags | map('tojson') | join(', ') }}],
+    "user_data": "{\"isSausage\":true,\"positions\":{\"{{ uuid_AttachMultipleVLAN }}\":[290,80,1]} }",
+    "label": "{{ label }}",
+    "visible": true,
+    "policy_type_name": "batch",
+    "attributes": { "subpolicies": [ "{{ uuid_AttachMultipleVLAN_pipeline }}" ] },
+    "id": "{{ uuid_ct_batch }}"
+  },
+  {
+    "description": "Add a list of VLANs to interfaces, as tagged or untagged.",
+    "label": "Virtual Network (Multiple)",
+    "visible": false,
+    "attributes": { "untagged_vn_node_id": "{{ untagged_vn_node_id }}", "tagged_vn_node_ids": [ {{ tagged_vn_node_ids | map('tojson') | join(', ') }} ] },
+    "policy_type_name": "AttachMultipleVLAN",
+    "id": "{{ uuid_AttachMultipleVLAN }}"
+  },
+  {
+    "description": "Add a list of VLANs to interfaces, as tagged or untagged.",
+    "label": "Virtual Network (Multiple) (pipeline)",
+    "visible": false,
+    "attributes": { "second_subpolicy": null, "first_subpolicy": "{{ uuid_AttachMultipleVLAN }}" },
+    "policy_type_name": "pipeline",
+    "id": "{{ uuid_AttachMultipleVLAN_pipeline }}"
+  }
+  ]
+}

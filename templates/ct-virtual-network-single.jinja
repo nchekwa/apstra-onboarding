@@ -1,0 +1,59 @@
+{% macro random_string(len) -%}{% for i in range(0,len) -%}{{ [0,1,2,3,4,5,6,7,8,9,"a","b","c","d","e","f"]|random }}{% endfor %}{%- endmacro -%}
+{% macro random_uuid4() -%} {{ random_string(8) + "-" + random_string(4) + "-" + random_string(4) + "-" + random_string(4) + "-" + random_string(12) }}{%- endmacro -%}
+
+{%- set uuid_ct_batch = random_uuid4() %}
+{%- set uuid_AttachSingleVLAN = random_uuid4() %}
+{%- set uuid_AttachSingleVLAN_pipeline = random_uuid4() %}
+
+{% set label = label|default(name) %}
+
+{% if untagged_vn_node_id is defined and untagged_vn_node_id is not none %}
+  {% set vn_node_id = untagged_vn_node_id %}
+  {% set tag_type = 'untagged' %}
+{% endif %}
+
+{% if tagged_vn_node_ids is defined and tagged_vn_node_ids|length > 0 %}
+  {% set vn_node_id = tagged_vn_node_ids[0] %}
+  {% set tag_type = 'vlan_tagged' %}
+{% endif %}
+
+
+{% if tags is defined and tags|length > 1 %}
+  {% set new_tags = [] %}
+  {% set _ = new_tags.append(tags[0]) %}
+  {% set tags = new_tags %}
+{% endif %}
+
+
+
+
+{
+"policies": [
+  {
+    "description": "{{ description }}",
+    "tags": [{{ tags | map('tojson') | join(', ') }}],
+    "user_data": "{\"isSausage\":true,\"positions\":{\"{{ uuid_AttachSingleVLAN }}\":[290,80,1]} }",
+    "label": "{{ label }}",
+    "visible": true,
+    "policy_type_name": "batch",
+    "attributes": { "subpolicies": [ "{{ uuid_AttachSingleVLAN_pipeline }}" ] },
+    "id": "{{ uuid_ct_batch }}"
+  },
+  {
+    "description": "Add a single VLAN to interfaces, as tagged or untagged.",
+    "label": "Virtual Network (Single) | A-{{ random_string(8) }}",
+    "visible": false,
+    "attributes": { "vn_node_id": "{{vn_node_id}}", "tag_type": "{{tag_type|default('untagged')}}" },
+    "policy_type_name": "AttachSingleVLAN",
+    "id": "{{ uuid_AttachSingleVLAN }}"
+  },
+  {
+    "description": "Add a single VLAN to interfaces, as tagged or untagged.",
+    "label": "Virtual Network (Single) (pipeline)",
+    "visible": false,
+    "attributes": { "second_subpolicy": null, "first_subpolicy": "{{ uuid_AttachSingleVLAN }}" },
+    "policy_type_name": "pipeline",
+    "id": "{{ uuid_AttachSingleVLAN_pipeline }}"
+  }
+  ]
+}

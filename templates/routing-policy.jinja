@@ -1,0 +1,31 @@
+{% macro random_string(len) -%}{% for i in range(0,len) -%}{{ [0,1,2,3,4,5,6,7,8,9,"a","b","c","d","e","f"]|random }}{% endfor %}{%- endmacro -%}
+{% macro random_uuid4() -%} {{ random_string(8) + "-" + random_string(4) + "-" + random_string(4) + "-" + random_string(4) + "-" + random_string(12) }}{%- endmacro -%}
+
+{%- set uuid = random_uuid4() %}
+{% set label = label|default(name) %}
+{% set import_policy = import_policy if import_policy in ['default_only', 'extra_only'] else 'all' %}
+
+{% if export_policy is not defined %}
+    {% set export_policy = {} %}
+{% endif %}
+
+{
+    "export_policy": {
+        "spine_leaf_links": {{export_policy.get('spine_leaf_links', False) | tojson}},
+        "spine_superspine_links": {{export_policy.get('spine_superspine_links', False) | tojson}},
+        "l3edge_server_links": {{export_policy.get('l3edge_server_links', True) | tojson}},
+        "l2edge_subnets": {{export_policy.get('l2edge_subnets', True) | tojson}},
+        "loopbacks": {{export_policy.get('loopbacks', True) | tojson}},
+        "static_routes": {{export_policy.get('static_routes', False) | tojson}}
+    },
+    "description": "{{description}}",
+    "expect_default_ipv4_route": {{expect_default_ipv4_route|default(True)|tojson}},
+    "extra_export_routes": [{{ extra_export_routes | map('tojson') | join(', ') }}],
+    "aggregate_prefixes": [{{ aggregate_prefixes | map('tojson') | join(', ') }}],
+    "label": {{label|tojson}},
+    "policy_type": "user_defined",
+    "expect_default_ipv6_route": {{expect_default_ipv6_route|default(True)|tojson}},
+    "extra_import_routes": [{{ extra_import_routes | map('tojson') | join(', ') }}],
+    "id": {{uuid|tojson}},
+    "import_policy": "{{import_policy}}"
+}

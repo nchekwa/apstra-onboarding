@@ -1,0 +1,96 @@
+blueprints:
+  vEX Left:
+    apstra: ApstraLAB
+    #sync: True
+    parameters:
+      routing-zone:
+        vni_addend: 1000000
+    routing-policies:
+      - name: RP_Default
+    routing-zones:
+      *routing-zones
+    virtual-networks:
+      *virtual-networks
+    connectivity-templates:
+      - name: LAN111-Untaged
+        template: virtual-network-single
+        untagged_vn: COCA-COLA_LAN111
+      - name: LAN112-Tagged
+        template: virtual-network-single
+        tagged_vn: 
+          - COCA-COLA_LAN112
+          - COCA-COLA_LAN113
+      - name: LAN113-Untaged
+        description: TestDescription123
+        template: virtual-network-multiple
+        untagged_vn: COCA-COLA_LAN113
+        tagged_vns: COCA-COLA_LAN114
+        tags: [ABCTAG]
+      - name: LAN114-Tagged
+        template: virtual-network-multiple
+        tagged_vns: 
+          - COCA-COLA_LAN114
+          - COCA-COLA_LAN1122
+          - 30112
+          - VNI30115
+    nodes:
+      - name: Server1
+        external: false
+        links:
+        - ifname: eth0
+          switch: Leaf1
+          switch_port: ge-0/0/0
+        - ifname: eth1
+          switch: Leaf2
+          switch_port: ge-0/0/0  
+        - ifname: eth2
+          switch: Leaf1
+          switch_port: ge-0/0/1
+          lag: lag0
+        - ifname: eth3
+          switch: Leaf2
+          switch_port: ge-0/0/1 
+          lag: lag0 
+
+      - name: Server2
+        external: false
+        links:
+        - ifname: eth0
+          switch: Leaf1
+          switch_port: ge-0/0/3
+        - ifname: eth1
+          switch: Leaf2
+          switch_port: ge-0/0/3  
+        - ifname: eth2
+          switch: Leaf1
+          switch_port: ge-0/0/4
+          lag: lag0
+        - ifname: eth3
+          switch: Leaf2
+          switch_port: ge-0/0/4 
+          lag: lag0
+          ct: LAN114-Tagged
+
+
+      - name: Server3
+        external: false
+        tags: 
+          - tag_server3
+        links:
+        - ifname: eth0
+          switch: Leaf1
+          switch_port: ge-0/0/5
+          ct: LAN113-Untaged
+        - ifname: eth1
+          switch: Leaf2
+          switch_port: ge-0/0/5  
+        - ifname: eth2
+          switch: Leaf1
+          switch_port: xe-0/3/0
+          lag: lag0
+          ct:
+          - LAN111-Untaged
+        - ifname: eth3
+          switch: Leaf2
+          switch_port: xe-0/3/0
+          lag: lag0 

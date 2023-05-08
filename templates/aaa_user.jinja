@@ -1,0 +1,8 @@
+{
+  "username": {{ username|tojson }},
+  "first_name": {{ first_name|tojson }},
+  "last_name": {{ last_name|tojson }},
+  "roles": {{ roles|default('[]')|tojson }},
+  "password": {{ password|tojson }},
+  "email": {{ email|tojson }}
+}

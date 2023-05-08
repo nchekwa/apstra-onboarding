@@ -1,0 +1,139 @@
+{% macro random_string(len) -%}{% for i in range(0,len) -%}{{ [0,1,2,3,4,5,6,7,8,9,"a","b","c","d","e","f"]|random }}{% endfor %}{%- endmacro -%}
+{% macro random_uuid4() -%} {{ random_string(8) + "-" + random_string(4) + "-" + random_string(4) + "-" + random_string(4) + "-" + random_string(12) }}{%- endmacro -%}
+
+{% macro random_id() -%} {{ random_string(20) }}{%- endmacro -%}
+
+{% set uuid = random_uuid4() %}
+{% set uuid2 = random_uuid4() %}
+{% set label = label|default(name) %}
+{
+    "new_systems": [
+        
+    {
+        "id": {{uuid|tojson}},
+        "port_channel_id_max": 0,
+        "port_channel_id_min": 0,
+        "system_index": null,
+        "tags": [{{ tags | map('tojson') | join(', ') }}],
+        "position_data": null,
+        "property_set": null,
+        "hostname": "{{hostname|default(label)}}",
+        "group_label": null,
+        "access_l3_peer_link_port_channel_id_max": null,
+        "label": "{{label}}",
+        "access_l3_peer_link_port_channel_id_min": null,
+        "role": "{{role|default('generic')}}",
+        "system_type": "{{system_type|default('server')}}",
+        "management_level": "{{management_level|default('unmanaged')}}",
+        "system_id": null,
+        "type": "{{type|default('system')}}",
+        "deploy_mode": null,
+        {% if external is defined and external is false %}
+        "logical_device": {
+            "panels": [
+            {
+                "panel_layout": {
+                    "row_count": 3,
+                    "column_count": 20
+                },
+                "port_indexing": {
+                    "order": "T-B, L-R",
+                    "start_index": 1,
+                    "schema": "absolute"
+                },
+                "port_groups": [
+                    {
+                    "count": 12,
+                    "speed": {
+                        "unit": "G",
+                        "value": 1
+                        },
+                    "roles": [
+                        "leaf",
+                        "access"
+                        ]
+                    },
+                    {
+                    "count": 12,
+                    "speed": {
+                        "unit": "G",
+                        "value": 10
+                        },
+                    "roles": [
+                        "leaf",
+                        "access"
+                        ]
+                    },
+                    {
+                    "count": 12,
+                    "speed": {
+                        "unit": "G",
+                        "value": 25
+                        },
+                    "roles": [
+                        "leaf",
+                        "access"
+                        ]
+                    },
+                    {
+                    "count": 12,
+                    "speed": {
+                        "unit": "G",
+                        "value": 40
+                        },
+                    "roles": [
+                        "leaf",
+                        "access"
+                        ]
+                    },
+                    {
+                    "count": 12,
+                    "speed": {
+                        "unit": "G",
+                        "value": 100
+                        },
+                    "roles": [
+                        "leaf",
+                        "access"
+                        ]
+                    }
+                ]
+            }
+            ],
+            "display_name": "AOS-Logical Server",
+            "id": "ZfG4J-UdzI0bwzaVZdM"
+        },
+        {% endif %}
+        "external": {{external|default(True)|tojson}}
+    }
+    ],
+    "links": [
+        {% for item in links %}
+            {% set lgl = item['link_group_label']|default(item['lag'])|default(item['ifname']) %}
+            
+            {% if lgl is defined and lgl.startswith('lag') %}
+                {% set lm = item['lag_mode']|default('lacp_active') %}
+            {% else %}
+                {% set lm = item['lag_mode']|default('') %}
+            {% endif %}
+
+            {% set link_id = random_id() %}
+            {
+            "link_group_label": "{{lgl|default(random_uuid4())}}",
+            "id": {{ link_id|tojson }},
+            {% if lm != '' %}"lag_mode": "{{lm|default('')}}",{% endif %}
+            "switch":
+                { 
+                "system_id": "{{item['switch_id']}}",
+                "transformation_id":1,
+                "if_name":"{{item['switch_port']}}"
+                },
+            "system":
+                {
+                {% if external is defined and external is true %}"if_name": {{item['ifname']|default(None)|tojson}}, {% endif %}
+                "system_id": {{item['system_id']|default(None)|tojson}}
+                }
+            } {% if not loop.last %}, {% endif %}
+        {% endfor %}
+  ]
+}

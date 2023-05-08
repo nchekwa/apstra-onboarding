@@ -1,0 +1,8 @@
+aos:
+  ApstraLAB:
+    host: 10.10.10.8
+    username: admin
+    password: admin
+    blueprints:
+      - vEX Right
+      - vEX Left

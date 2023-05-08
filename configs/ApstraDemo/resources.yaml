@@ -1,0 +1,34 @@
+
+resource:
+  ip-pools:
+    - name: VRF-Leaf-Loopbacks
+      apstra: ApstraLAB
+      subnets: 
+      - 10.128.0.0/24
+
+  vni-pools:
+    - name: DEMO1-VNI-pools
+      apstra: ApstraLAB
+      ranges: 
+      - 44 - 88
+      - 4096-4098
+      - 4096 to 5097
+      - 10000 to 10010
+
+    - name: NL-DEMO1-VNI-pools
+      apstra: ApstraLAB
+      ranges: 
+      - 44 - 88
+      - 4096-4098
+      - 4096 to 5097
+      - 10000 to 10010
+
+  asn-pools:
+    - name: DEMO1-ASN-pools
+      apstra: ApstraLAB
+      ranges: 
+      - 44 - 88
+      - 44     -99
+      - 4096-4098
+      - 4096 to 5097
+      - 10000   to     10010

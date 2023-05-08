@@ -1,0 +1,43 @@
+{% macro random_string(len) -%}{% for i in range(0,len) -%}{{ [0,1,2,3,4,5,6,7,8,9,"a","b","c","d","e","f"]|random }}{% endfor %}{%- endmacro -%}
+{% macro random_uuid4() -%} {{ random_string(8) + "-" + random_string(4) + "-" + random_string(4) + "-" + random_string(4) + "-" + random_string(12) }}{%- endmacro -%}
+
+{%- set vn_uuid = random_uuid4() %}
+
+{% set label = label|default(name) %}
+{% set route_target = route_target|default(vn_id|string + ":1") %}
+
+{% set vn_type = vn_type if vn_type in ['vxlan', 'vlan'] else 'vxlan' %}
+
+{% if ipv4_enabled is true and virtual_gateway_ipv4 is not none %}
+  {% set virtual_gateway_ipv4_enabled = true %}
+{% endif %}
+
+{
+  "bound_to": {{bound_to|tojson|default([])}},
+  "svi_ips": [],
+  "rt_policy": {
+    "import_RTs": {{import_RTs|default(None)|tojson}},
+    "export_RTs": {{export_RTs|default(None)|tojson}}
+  },
+  "virtual_gateway_ipv6_enabled": {{virtual_gateway_ipv6_enabled|default(False)|tojson}},
+  "dhcp_service": "dhcpServiceDisabled",
+  "virtual_gateway_ipv4": {{virtual_gateway_ipv4|default(None)|tojson}},
+  "virtual_gateway_ipv6": {{virtual_gateway_ipv6|default(None)|tojson}},
+  "label": {{label|tojson}},
+  "default_endpoint_tag_types": {{default_endpoint_tag_types|default({})}},
+  "reserved_vlan_id": {{vlan_id|default(None)|tojson}},
+  "ipv4_enabled": {{ipv4_enabled|default(False)|tojson}},
+  "create_policy_tagged":  {{create_policy_tagged|default(False)|tojson}},
+  "description": "{{description}}",
+  "virtual_mac": {{virtual_mac|default(None)|tojson}},
+  "ipv6_subnet": {{ipv6_subnet|default(None)|tojson}},
+  "vn_type": {{vn_type|tojson}},
+  "ipv4_subnet": {{ipv4_subnet|default(None)|tojson}},
+  "ipv6_enabled": {{ipv6_enabled|default(False)|tojson}},
+  "create_policy_untagged": {{create_policy_untagged|default(False)|tojson}},
+  "security_zone_id": {{security_zone_id|default('Default')|tojson}},
+  "virtual_gateway_ipv4_enabled": {{virtual_gateway_ipv4_enabled|default(False)|tojson}},
+  "vn_id": {{vn_id|tojson}},
+  "endpoints": {{endpoints|default([])}},
+  "id": {{vn_uuid|tojson}} 
+}

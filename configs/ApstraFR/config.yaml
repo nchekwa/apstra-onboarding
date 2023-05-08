@@ -1,0 +1,76 @@
+aos:
+  ApstraFR:
+    host: 10.10.10.108
+    username: admin
+    password: admin
+    port: 443
+    blueprints:
+      - POC_DC_TRELAZE
+
+blueprints:
+  POC_DC_TRELAZE:
+    apstra: ApstraFR
+    sync: True
+    routing-zones:
+      - name: PEPSI
+        vlan_id: 1010
+        vni_id: 201010
+        leaf_loopback_ip_pools:
+        - MyLoopbacks
+      - name: COCA-COLA
+        vlan_id: 1011
+        vni_id: 201011
+        leaf_loopback_ip_pools:
+        - MyLoopbacks
+      
+    virtual-networks:
+      - name: PEPSI_VLAN302
+        routing_zone: PEPSI
+        vlan_id: 302
+        vn_id: 30002
+        ipv4_enabled: False
+        bound_to:
+          - system: frtrlz-apstra-swlea-011
+            vlan_id: 1030
+            access_switches: [ swacc-100 ]
+    nodes:
+      - name: Server1
+        external: false
+        links:
+        - ifname: eth0
+          switch: swacc-100
+          switch_port: ge-0/0/10
+          speed: 1G
+        - ifname: eth1
+          switch: swacc-100
+          switch_port: ge-0/0/11
+        - ifname: eth2
+          switch: swacc-100
+          switch_port: ge-0/0/12
+          lag: lag0
+        - ifname: eth3
+          switch: swacc-100
+          switch_port: ge-0/0/13
+          lag: lag0 
+
+
+resource:
+  ip-pools:
+    - name: MyLoopbacks
+      apstra: ApstraFR
+      tags: [TAG1, TAG2]
+      subnets: 
+      - 192.168.88.0/24
+
+  #vni-pools:
+  #  *vni_pool
+
+
+  asn-pools:
+    - name: DEMO1-VNI-pools
+      apstra: ApstraFR
+      ranges: 
+      - 44 - 88
+      - 4096-4098
+      - 4096 to 5097
+      - 10000 to 10010

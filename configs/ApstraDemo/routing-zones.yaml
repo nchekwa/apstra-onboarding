@@ -1,0 +1,26 @@
+routing-zones: &routing-zones
+  - name: COCA-COLA
+    vlan_id: 4010
+    vni_id: 1004010
+    leaf_loopback_ip_pools:
+    - VRF-Leaf-Loopbacks
+    dhcp_servers:
+    - 192.168.1.1
+    - 192.168.100.1
+  - name: PEPSI
+    vlan_id: 4020
+    vni_id: 1004020
+    leaf_loopback_ip_pools:
+    - VRF-Leaf-Loopbacks
+  - name: 7UP
+    vlan_id: 4030
+    leaf_loopback_ip_pools:
+    - VRF-Leaf-Loopbacks
+  - name: MIRINDA
+    vlan_id: 4040
+    leaf_loopback_ip_pools:
+    - VRF-Leaf-Loopbacks
+  - name: DR_PEPPER
+    vlan_id: 4050
+    leaf_loopback_ip_pools:
+    - VRF-Leaf-Loopbacks

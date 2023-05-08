@@ -1,0 +1,31 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "BoardingApstra",
+    "type": "object",
+    "title": "BoardingApstra",
+    "properties": {
+        "blueprints": {
+            "type": "object",
+            "additionalProperties": false,
+            "patternProperties": {
+                "^[a-zA-Z0-9_\\s]+$": {
+                    "$ref": "def_blueprint.json#/definitions/BlueprintDef"
+                }
+            },
+            "minProperties": 1
+        },
+        "aos": {
+            "type": "object",
+            "additionalProperties": false,
+            "patternProperties": {
+                "^[a-zA-Z0-9_.-]+$": {
+                    "$ref": "def_aos.json#/definitions/ApstraServerDef"
+                }
+            },
+            "minProperties": 1
+        },
+        "resource": {
+            "$ref": "def_resources.json#/definitions/Resources"
+        }
+    }
+}

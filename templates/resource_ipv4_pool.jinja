@@ -1,0 +1,12 @@
+{% macro random_string(len) -%}{% for i in range(0,len) -%}{{ [0,1,2,3,4,5,6,7,8,9,"a","b","c","d","e","f"]|random }}{% endfor %}{%- endmacro -%}
+{% macro random_uuid4() -%} {{ random_string(8) + "-" + random_string(4) + "-" + random_string(4) + "-" + random_string(4) + "-" + random_string(12) }}{%- endmacro -%}
+
+{%- set uuid = random_uuid4() %}
+
+{
+"status":  {{status|default('not_in_use')|tojson}},
+"display_name":  {{display_name|tojson}},
+"tags": {{tags|default([])}},
+"subnets": [{% for s in subnets %}{{ s|tojson }}{% if not loop.last %}, {% endif %}{% endfor %}],
+"id": {{uuid|tojson}}
+}

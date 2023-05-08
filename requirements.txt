@@ -1,0 +1,9 @@
+# pip3 install -r requirements.txt
+pandas
+openpyxl
+flask
+flask-restx
+Jinja2
+werkzeug
+dataclasses
+colorlog

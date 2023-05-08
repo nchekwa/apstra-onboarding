@@ -1,0 +1,5 @@
+# Ignore logs and webui folders
+logs/
+webui/
+__pycache__/
+**/__pycache__/
