@@ -218,6 +218,7 @@ class Config():
         base_uri = 'file:' + os.path.abspath(os.path.dirname(schema_file_path)) + '/'
         resolver = jsonschema.RefResolver(base_uri, schema)
         validator = jsonschema.Draft7Validator(schema, resolver=resolver)
+        #pprint(data)
         #pprint(validator)
         try:
             validator.validate(data)

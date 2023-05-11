@@ -19,6 +19,8 @@ RESET = '\033[0m'
 class Sync():
     from . import BoardingAOS
     
+    from apstra.dao import RoutePolicy
+    
     def __init__(self, main_class: BoardingAOS):
         self.parameters = main_class.parameters
         self.internal = main_class.internal
@@ -46,12 +48,47 @@ class Sync():
 
             logger.info(self.internal.generate_line(97,3))
             
+            self.routing_policies()
             self.nodes()
             self.connectivity_template()
             self.virtual_network()
             self.routing_zones()
             
+
+
+    def routing_policies(self):
+        routing_policies_list = self.apstra.blueprint.routing_policies.get_all()
+        logger.info(f"SYNC: Routing Policy ({self.parameters.active_bp.label})")
+        for apstra_graph_routing_policie in routing_policies_list:
+            sync_element = dict()
+            sync_element['apstra_graph'] = apstra_graph_routing_policie
+
+            try:
+                config_element = list(self.internal.dsearch(self.parameters.config['blueprints'][self.parameters.active_bp.label]['routing-policies'], label=apstra_graph_routing_policie.label))
+                config_element_name = config_element[0].get('label')
+                sync_element['yaml'] = config_element[0]
+                sync_element['status'] = "OK"
+                print_status = "OK"
+            except:
+                config_element_name = 'Not Exist'
+                print_status = f"{RED}NOK (need to be removed from Apstra Server){RESET}"
+                sync_element['status'] = "DELETE"
+
+            if "OFF" in self.sync_status and sync_element['status'] != "OK":
+                sync_element['status'] = "OK"
+                print_status = f"OK [sync: OFF]"
+                
+            self.parameters.sync[self.parameters.active_bp.label]['nodes'][apstra_graph_routing_policie.label] = sync_element
+    
+            if print_status.startswith("OK"):
+                logger.info(f"        {apstra_graph_routing_policie.label.rjust(40)} {BLUE}<AOS -vs- YAML>{GREEN0} {config_element_name.ljust(40)} --- status: {print_status}")
+            else:
+                logger.warning(f"        {apstra_graph_routing_policie.label.rjust(40)} {BLUE}<AOS -vs- YAML>{GREEN0} {config_element_name.ljust(40)} --- status: {print_status}")
             
+        logger.debug("SYNC: self.parameters.sync[bp_name]['routing-policies'][config_element_name]")
+        logger.info(self.internal.generate_line(150))
+        return(0)    
+
     def nodes(self):
         nodes_list = self.apstra.blueprint.nodes.get_all_servers(self.parameters.active_bp.id)
         logger.info(f"SYNC: Node ({self.parameters.active_bp.label})")
@@ -60,19 +97,19 @@ class Sync():
             sync_element['apstra_graph'] = apstra_graph_node._asdict()
 
             try:
-                node_config_element = list(self.internal.dsearch(self.parameters.config['blueprints'][self.parameters.active_bp.label]['nodes'], label=apstra_graph_node.label))
-                node_name = node_config_element[0].get('label')
-                sync_element['yaml'] = node_config_element[0]
+                config_element = list(self.internal.dsearch(self.parameters.config['blueprints'][self.parameters.active_bp.label]['nodes'], label=apstra_graph_node.label))
+                config_element_name = config_element[0].get('label')
+                sync_element['yaml'] = config_element[0]
                 sync_element['status'] = "OK"
                 print_status = "OK"
             except:
-                node_name = 'Not Exist'
+                config_element_name = 'Not Exist'
                 print_status = f"{RED}NOK (need to be removed from Apstra Server){RESET}"
                 sync_element['status'] = "DELETE"
 
             if "OFF" in self.sync_status and sync_element['status'] != "OK":
                 sync_element['status'] = "OK"
-                print_status = f"OK [sync: {YELLOW}OFF{GREEN0}]"
+                print_status = f"OK [sync: OFF]"
 
             if apstra_graph_node.tags is not None and 'protect' in apstra_graph_node.tags:
                 sync_element['status'] = "OK"
@@ -81,11 +118,11 @@ class Sync():
             self.parameters.sync[self.parameters.active_bp.label]['nodes'][apstra_graph_node.label] = sync_element
     
             if print_status.startswith("OK"):
-                logger.info(f"        {apstra_graph_node.label.rjust(40)} {BLUE}<AOS -vs- YAML>{GREEN0} {node_name.ljust(40)} --- status: {print_status}")
+                logger.info(f"        {apstra_graph_node.label.rjust(40)} {BLUE}<AOS -vs- YAML>{GREEN0} {config_element_name.ljust(40)} --- status: {print_status}")
             else:
-                logger.warning(f"        {apstra_graph_node.label.rjust(40)} {BLUE}<AOS -vs- YAML>{GREEN0} {node_name.ljust(40)} --- status: {print_status}")
+                logger.warning(f"        {apstra_graph_node.label.rjust(40)} {BLUE}<AOS -vs- YAML>{GREEN0} {config_element_name.ljust(40)} --- status: {print_status}")
             
-        logger.debug("SYNC: self.parameters.sync[bp_name]['nodes'][node_name] ")
+        logger.debug("SYNC: self.parameters.sync[bp_name]['nodes'][config_element_name]")
         logger.info(self.internal.generate_line(150))
         return(0)     
 
@@ -98,19 +135,19 @@ class Sync():
             sync_element['apstra_graph'] = apstra_graph_rz
             
             try:
-                rz_config_element = list(self.internal.dsearch(self.parameters.config['blueprints'][self.parameters.active_bp.label]['routing-zones'], label=apstra_graph_rz.vrf_name))
-                rz_name = rz_config_element[0].get('label')
-                sync_element['yaml'] = rz_config_element[0]
+                config_element = list(self.internal.dsearch(self.parameters.config['blueprints'][self.parameters.active_bp.label]['routing-zones'], label=apstra_graph_rz.vrf_name))
+                config_element_name = config_element[0].get('label')
+                sync_element['yaml'] = config_element[0]
                 sync_element['status'] = "OK"
                 print_status = "OK"
             except:
-                rz_name = 'Not Exist'
+                config_element_name = 'Not Exist'
                 print_status = f"{RED}NOK (need to be removed from Apstra Server){RESET}"
                 sync_element['status'] = "DELETE"
 
             if "OFF" in self.sync_status and sync_element['status'] != "OK":
                 sync_element['status'] = "OK"
-                print_status = f"OK [sync: {YELLOW}OFF{GREEN0}]"
+                print_status = f"OK [sync: OFF]"
                 
             if apstra_graph_rz.vrf_name == "default":
                 print_status = "OK  (default)"
@@ -119,11 +156,11 @@ class Sync():
             self.parameters.sync[self.parameters.active_bp.label]['routing-zones'][apstra_graph_rz.vrf_name] = sync_element
             
             if print_status.startswith("OK"):
-                logger.info(f"        {apstra_graph_rz.vrf_name.rjust(40)} {BLUE}<AOS -vs- YAML>{GREEN0} {rz_name.ljust(40)} --- status: {print_status}")
+                logger.info(f"        {apstra_graph_rz.vrf_name.rjust(40)} {BLUE}<AOS -vs- YAML>{GREEN0} {config_element_name.ljust(40)} --- status: {print_status}")
             else:
-                logger.warning(f"        {apstra_graph_rz.vrf_name.rjust(40)} {BLUE}<AOS -vs- YAML>{GREEN0} {rz_name.ljust(40)} --- status: {print_status}")
+                logger.warning(f"        {apstra_graph_rz.vrf_name.rjust(40)} {BLUE}<AOS -vs- YAML>{GREEN0} {config_element_name.ljust(40)} --- status: {print_status}")
         
-        logger.debug("SYNC: self.parameters.sync[bp_name]['routing-zones'][vrf_name] ")
+        logger.debug("SYNC: self.parameters.sync[bp_name]['routing-zones'][config_element_name]")
         logger.info(self.internal.generate_line(150))
         return(0)
     
@@ -136,28 +173,28 @@ class Sync():
             sync_element['apstra_graph'] = apstra_graph_vn
 
             try:
-                vn_config_element = list(self.internal.dsearch(self.parameters.config['blueprints'][self.parameters.active_bp.label]['virtual-networks'], label=apstra_graph_vn.label))
-                vn_name = vn_config_element[0].get('label')
-                sync_element['yaml'] = vn_config_element[0]
+                config_element = list(self.internal.dsearch(self.parameters.config['blueprints'][self.parameters.active_bp.label]['virtual-networks'], label=apstra_graph_vn.label))
+                config_element_name = config_element[0].get('label')
+                sync_element['yaml'] = config_element[0]
                 sync_element['status'] = "OK"
                 print_status = "OK"
             except:
-                vn_name = 'Not Exist'
+                config_element_name = 'Not Exist'
                 print_status = f"{RED}NOK (need to be removed from Apstra Server){RESET}"
                 sync_element['status'] = "DELETE"
 
             if "OFF" in self.sync_status and sync_element['status'] != "OK":
                 sync_element['status'] = "OK"
-                print_status = f"OK [sync: {YELLOW}OFF{GREEN0}]"
+                print_status = f"OK [sync: OFF]"
 
             self.parameters.sync[self.parameters.active_bp.label]['virtual-networks'][apstra_graph_vn.label] = sync_element
 
             if print_status.startswith("OK"):
-                logger.info(f"        {apstra_graph_vn.label.rjust(40)} {BLUE}<AOS -vs- YAML>{GREEN0} {vn_name.ljust(40)} --- status: {print_status}")
+                logger.info(f"        {apstra_graph_vn.label.rjust(40)} {BLUE}<AOS -vs- YAML>{GREEN0} {config_element_name.ljust(40)} --- status: {print_status}")
             else:
-                logger.warning(f"        {apstra_graph_vn.label.rjust(40)} {BLUE}<AOS -vs- YAML>{GREEN0} {vn_name.ljust(40)} --- status: {print_status}")
+                logger.warning(f"        {apstra_graph_vn.label.rjust(40)} {BLUE}<AOS -vs- YAML>{GREEN0} {config_element_name.ljust(40)} --- status: {print_status}")
 
-        logger.debug("SYNC: self.parameters.sync[bp_name]['virtual-networks'][vn_name] ")
+        logger.debug("SYNC: self.parameters.sync[bp_name]['virtual-networks'][config_element_name]")
         logger.info(self.internal.generate_line(150))
         return(0)
       
@@ -172,19 +209,19 @@ class Sync():
             sync_element['apstra_graph'] = apstra_graph_ct
             
             try:
-                ct_config_element = list(self.internal.dsearch(self.parameters.config['blueprints'][self.parameters.active_bp.label]['connectivity-templates'], label=apstra_graph_ct.label))
-                ct_name = ct_config_element[0].get('label')
-                sync_element['yaml'] = ct_config_element[0]
+                config_element = list(self.internal.dsearch(self.parameters.config['blueprints'][self.parameters.active_bp.label]['connectivity-templates'], label=apstra_graph_ct.label))
+                config_element_name = config_element[0].get('label')
+                sync_element['yaml'] = config_element[0]
                 sync_element['status'] = "OK"
                 print_status = "OK"
             except:
-                ct_name = 'Not Exist'
+                config_element_name = 'Not Exist'
                 print_status = f"{RED}NOK (need to be removed from Apstra Server){RESET}"
                 sync_element['status'] = "DELETE"
             
             if "OFF" in self.sync_status and sync_element['status'] != "OK":
                 sync_element['status'] = "OK"
-                print_status = f"OK [sync: {YELLOW}OFF{GREEN0}]"
+                print_status = f"OK [sync: OFF]"
                 
             if apstra_graph_ct.tags is not None and 'protect' in apstra_graph_ct.tags:
                 sync_element['status'] = "OK"
@@ -193,11 +230,11 @@ class Sync():
             self.parameters.sync[self.parameters.active_bp.label]['connectivity-templates'][apstra_graph_ct.label] = sync_element
             
             if print_status.startswith("OK"):
-                logger.info(f"        {apstra_graph_ct.label.rjust(40)} {BLUE}<AOS -vs- YAML>{GREEN0} {ct_name.ljust(40)} --- status: {print_status}")
+                logger.info(f"        {apstra_graph_ct.label.rjust(40)} {BLUE}<AOS -vs- YAML>{GREEN0} {config_element_name.ljust(40)} --- status: {print_status}")
             else:
-                logger.warning(f"        {apstra_graph_ct.label.rjust(40)} {BLUE}<AOS -vs- YAML>{GREEN0} {ct_name.ljust(40)} --- status: {print_status}")
+                logger.warning(f"        {apstra_graph_ct.label.rjust(40)} {BLUE}<AOS -vs- YAML>{GREEN0} {config_element_name.ljust(40)} --- status: {print_status}")
      
-        logger.debug("SYNC: self.parameters.sync[bp_name]['connectivity-templates'][ct_name] ")
+        logger.debug("SYNC: self.parameters.sync[bp_name]['connectivity-templates'][config_element_name]")
         logger.info(self.internal.generate_line(150))
         return(0)
     

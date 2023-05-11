@@ -30,6 +30,23 @@
                     },
                     "additionalProperties": false
                 },
+                "routing-policies": {
+                    "type": "array",
+                    "additionalItems": true,
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "additionalProperties": false,
+                        "minProperties": 1,
+                        "required": [
+                            "name"
+                        ]
+                    }
+                },
                 "routing-zones": {
                     "type": "array",
                     "additionalItems": true,
@@ -210,10 +227,6 @@
                             "template"
                         ]
                     }
-                },
-                "routing-policies": {
-                    "type": "array",
-                    "additionalItems": true
                 },
                 "nodes": {
                     "type": "array",
