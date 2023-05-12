@@ -211,7 +211,8 @@ class Rest:
                     del(data)
                     data = items_list
                     continue
-
+        
+        #pprint(data)
         results = []
         for item in data[k] if isinstance(data, dict) else data:
             if item.get(variable_name) == value:

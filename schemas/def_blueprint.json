@@ -165,7 +165,7 @@
                                 }
                             }
                         },
-                        "additionalProperties": false,
+                        "additionalProperties": true,
                         "minProperties": 1,
                         "required": [
                             "name",

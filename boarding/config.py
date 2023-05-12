@@ -79,6 +79,7 @@ class Config():
         #pprint(self.parameters.config)
         for bp_name in self.parameters.config['blueprints']:
             self.parameters.sync[bp_name] = dict()
+            self.parameters.sync[bp_name]['routing-policies'] = dict()
             self.parameters.sync[bp_name]['routing-zones'] = dict()
             self.parameters.sync[bp_name]['virtual-networks'] = dict()
             self.parameters.sync[bp_name]['connectivity-templates'] = dict()
@@ -145,7 +146,7 @@ class Config():
                     if rs.get('apstra') is None:
                         del(self.parameters.config['resource'][rs_typ][i])
         else:
-            self.parameters.config['resource'] = list()
+            self.parameters.config['resource'] = dict()
 
         # routing-policies:
         # if routing-policies is not define - create empty dict

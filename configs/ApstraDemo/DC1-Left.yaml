@@ -1,7 +1,7 @@
 blueprints:
   vEX Left:
     apstra: ApstraLAB
-    #sync: True
+    sync: False
     parameters:
       routing-zone:
         vni_addend: 1000000

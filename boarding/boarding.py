@@ -19,7 +19,7 @@ YELLOW = '\033[1;33m'
 BLUE = '\033[1;34m'
 RESET = '\033[0m'
 
-from apstra.dao import RoutingZone, VirtualNetwork, ObjPolicy
+from apstra.dao import RoutingZone, VirtualNetwork, ObjPolicy, RoutePolicy
 
 class Boarding:
     from . import BoardingAOS
@@ -48,7 +48,9 @@ class Boarding:
             self.nodes()
             self.nodes_interface_speed()
             self.nodes_connectivity_template_assign()
-            
+
+
+
     def resorces_create(self):
         logger.info(f"BOARDING: Resources")
         logger.info(self.internal.generate_line(147,3))
@@ -78,7 +80,39 @@ class Boarding:
                     except:
                         pass
         return('done')
+
+
+    def routing_policies(self):
+        for rp_data in self.parameters.config['blueprints'][self.parameters.active_bp.label].get('routing-policies'):
+            # Check Sync
+            try:
+                sync_status = self.parameters.sync[self.parameters.active_bp.label]['routing-zones'][rp_data['label']]['status']
+                apstra_graph_rp:RoutePolicy = self.parameters.sync[self.parameters.active_bp.label]['routing-zones'][rp_data['label']]['apstra_graph']
+                id = apstra_graph_rp.id
+            except:
+                sync_status = ""
             
+            if sync_status == "OK":
+                logger.info(f"          RZ: {rp_data['label']}: \033[1;32mSKIP BOARDING\033[0m: Exist ID: {id} - sync status OK")
+                continue
+            ############
+                    
+            logger.info(f"BOARDING: RZ: {rp_data['label']}: Create Routing-Zones inside bluprint '{self.parameters.active_bp.label}'")
+            logger.debug(f"          RZ: {rp_data}")
+            
+            try:
+                self.apstra.blueprint.routing_policies.create(rp_data) 
+            except TypeError as e:
+                logger.critical(f"          ERROR: {e}")
+                self.apstra.blueprint.revert(self.parameters.active_bp.id)
+                raise ErrorApstraBoarding(e)
+            except:
+                logger.critical(f"          ERROR: Boarding Policie {rp_data}")
+                logger.critical(f"          ERROR: {e}")
+                self.apstra.blueprint.revert(self.parameters.active_bp.id)
+                raise ErrorApstraBoarding(f"Boarding Routing Policie {rp_data}")
+        return(1) 
+    
     def routing_zones(self):
         for rz_data in self.parameters.config['blueprints'][self.parameters.active_bp.label].get('routing-zones'):
             #pprint(rz_data)

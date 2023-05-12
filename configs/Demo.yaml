@@ -1,0 +1,60 @@
+aos:
+  ApstraLAB:
+    host: 10.10.10.8
+    username: admin
+    password: admin
+    blueprints:
+      - vEX Right
+      - vEX Left
+blueprints:
+  vEX Left:
+    apstra: ApstraLAB
+    sync: False
+    routing-policies:
+      - name: RP_Default
+    routing-zones:
+      - name: COCA-COLA
+        vlan_id: 4010
+        vni_id: 1004010
+        leaf_loopback_ip_pools:
+        - VRF-Leaf-Loopbacks
+    virtual-networks:
+      - name: COCA-COLA_LAN110
+        routing_zone: COCA-COLA
+        vlan_id: 110
+        vn_id: 30110
+        create_policy_untagged: True
+        ipv4_enabled: True
+        ipv4_subnet: 192.168.110.0/24
+        virtual_gateway_ipv4: 192.168.110.1
+        bound_to:
+        - system: Leaf1
+        - system: Leaf2
+      - name: COCA-COLA_LAN111
+        routing_zone: COCA-COLA
+        vlan_id: 111
+        vn_id: 30111
+        create_policy_untagged: True
+        ipv4_enabled: True
+        ipv4_subnet: 192.168.111.0/24
+        virtual_gateway_ipv4: 192.168.111.1
+        bound_to:
+        - system: Leaf1
+        - system: Leaf2
+      - name: COCA-COLA_LAN112
+        routing_zone: COCA-COLA
+        vn_id: 30112
+        ipv4_enabled: False
+        create_policy_untagged: True
+        bound_to:
+        - system: Leaf1
+        - system: Leaf2
+    
+    nodes:
+      - name: Server1
+        external: false
+        links:
+        - ifname: eth0
+          switch: Leaf1
+          switch_port: ge-0/1/1
+          ct: "Untagged VxLAN 'COCA-COLA_LAN110'"

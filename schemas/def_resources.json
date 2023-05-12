@@ -4,31 +4,38 @@
     "title": "Resources",
     "definitions": {
         "Resources": {
-            "type": "object",
-            "properties": {
-                "asn-pools": {
-                    "type": "array",
-                    "additionalItems": false,
-                    "items": {
-                        "$ref": "#/definitions/ASNPool"
+            "anyOf": [
+                {
+                "type": "object",
+                "properties": {
+                    "asn-pools": {
+                        "type": "array",
+                        "additionalItems": false,
+                        "items": {
+                            "$ref": "#/definitions/ASNPool"
+                        }
+                    },
+                    "ip-pools": {
+                        "type": "array",
+                        "additionalItems": false,
+                        "items": {
+                            "$ref": "#/definitions/IPv4Pool"
+                        }
+                    },
+                    "vni-pools": {
+                        "type": "array",
+                        "additionalItems": false,
+                        "items": {
+                            "$ref": "#/definitions/VNIPool"
+                        }
                     }
                 },
-                "ip-pools": {
-                    "type": "array",
-                    "additionalItems": false,
-                    "items": {
-                        "$ref": "#/definitions/IPv4Pool"
-                    }
+                "additionalProperties": false
                 },
-                "vni-pools": {
-                    "type": "array",
-                    "additionalItems": false,
-                    "items": {
-                        "$ref": "#/definitions/VNIPool"
-                    }
+                {
+                "type": "null"
                 }
-            },
-            "additionalProperties": false
+            ]
         },
         "IPv4Pool": {
             "type": "object",

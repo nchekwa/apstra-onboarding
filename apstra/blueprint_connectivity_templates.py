@@ -32,14 +32,21 @@ class ConnectivityTemplates:
     def get(self, search_value = None, search_key: str = "label", bp_type: str = 'staging') -> Union[ObjPolicy,None]:
         uri = f"/api/blueprints/{self.parameters.active_bp.id}/obj-policy-export?type={bp_type}"
         try:
-            reponse_data = self.apstra.rest.search_object(search_value, search_key, uri)
-            if reponse_data is None:
+            reponse_data_list = self.apstra.rest.search(search_value, search_key, uri)
+            if len(reponse_data_list) == 0:
                 return None
+            if len(reponse_data_list) == 1:
+                reponse_data = reponse_data_list[0]
+            if len(reponse_data_list) > 1:
+                for obj in reponse_data_list:
+                    if obj['visible'] == True:
+                        reponse_data = obj
         except:
             return None
         
         routing_instance = from_dict(data_class=ObjPolicy, data=reponse_data)
         return(routing_instance)
+        
 
     def get_all(self) -> List[ObjPolicy]:
         uri = f"/api/blueprints/{self.parameters.active_bp.id}/obj-policy-export"

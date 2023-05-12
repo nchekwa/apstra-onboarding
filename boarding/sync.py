@@ -18,6 +18,7 @@ RESET = '\033[0m'
 
 class Sync():
     from . import BoardingAOS
+    from apstra.dao import RoutePolicy
     
     from apstra.dao import RoutePolicy
     
@@ -54,8 +55,26 @@ class Sync():
             self.virtual_network()
             self.routing_zones()
             
+            if bp_parameters.get('sync') == True:
+                self.delete_objects()
 
-
+    def delete_objects(self):
+        logger.info(f"SYNC {RED}ON{GREEN0}: Delete elements")
+        
+        for value in self.parameters.sync[self.parameters.active_bp.label]['nodes'].values():
+            status = value['status']
+            if status == "DELETE":
+                logger.info(f"{RED}DELETE:{GREEN0} Node: {value['apstra_graph']['label']} - {value['apstra_graph']['id']} ")
+                #Need to be implement delete node
+                
+        for value in self.parameters.sync[self.parameters.active_bp.label]['routing-policies'].values():
+            status = value['status']
+            #pprint(value)
+            if status == "DELETE":
+                logger.info(f"{RED}DELETE:{GREEN0} Routing-Policie: {value['apstra_graph'].label} - {value['apstra_graph'].id} ")
+                #self.apstra.blueprint.routing_policies.delete(value['apstra_graph'].id)
+        
+        
     def routing_policies(self):
         routing_policies_list = self.apstra.blueprint.routing_policies.get_all()
         logger.info(f"SYNC: Routing Policy ({self.parameters.active_bp.label})")
@@ -77,8 +96,12 @@ class Sync():
             if "OFF" in self.sync_status and sync_element['status'] != "OK":
                 sync_element['status'] = "OK"
                 print_status = f"OK [sync: OFF]"
-                
-            self.parameters.sync[self.parameters.active_bp.label]['nodes'][apstra_graph_routing_policie.label] = sync_element
+
+            if apstra_graph_routing_policie.label == "Default_immutable":
+                print_status = "OK  (default)"
+                sync_element['status'] = "OK"
+
+            self.parameters.sync[self.parameters.active_bp.label]['routing-policies'][apstra_graph_routing_policie.label] = sync_element
     
             if print_status.startswith("OK"):
                 logger.info(f"        {apstra_graph_routing_policie.label.rjust(40)} {BLUE}<AOS -vs- YAML>{GREEN0} {config_element_name.ljust(40)} --- status: {print_status}")
