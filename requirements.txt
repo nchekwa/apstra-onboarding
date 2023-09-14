@@ -10,3 +10,4 @@ colorlog
 typing
 urllib3
 dacita
+requests
