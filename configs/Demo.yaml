@@ -11,50 +11,183 @@ blueprints:
     apstra: ApstraLAB
     sync: False
     routing-policies:
-      - name: RP_Default
+      - name: RP_COLA
+      - name: RP_PEPSI
     routing-zones:
       - name: COCA-COLA
-        vlan_id: 4010
-        vni_id: 1004010
+        vlan_id: 199
+        vni_id: 110199
+        leaf_loopback_ip_pools:
+        - VRF-Leaf-Loopbacks
+      - name: PEPSI
+        vlan_id: 299
+        vni_id: 220299
         leaf_loopback_ip_pools:
         - VRF-Leaf-Loopbacks
     virtual-networks:
-      - name: COCA-COLA_LAN110
+      - name: COCA-COLA_LAN100
         routing_zone: COCA-COLA
-        vlan_id: 110
-        vn_id: 30110
+        vlan_id: 100
+        vn_id: 110100
         create_policy_untagged: True
+        create_policy_tagged: True
         ipv4_enabled: True
-        ipv4_subnet: 192.168.110.0/24
-        virtual_gateway_ipv4: 192.168.110.1
+        ipv4_subnet: 192.168.100.0/24
+        virtual_gateway_ipv4: 192.168.100.1
         bound_to:
         - system: Leaf1
         - system: Leaf2
-      - name: COCA-COLA_LAN111
+      - name: COCA-COLA_LAN101
         routing_zone: COCA-COLA
-        vlan_id: 111
-        vn_id: 30111
+        vlan_id: 101
+        vn_id: 110101
         create_policy_untagged: True
+        create_policy_tagged: True
         ipv4_enabled: True
-        ipv4_subnet: 192.168.111.0/24
-        virtual_gateway_ipv4: 192.168.111.1
+        ipv4_subnet: 192.168.101.0/24
+        virtual_gateway_ipv4: 192.168.101.1
         bound_to:
         - system: Leaf1
         - system: Leaf2
-      - name: COCA-COLA_LAN112
+      - name: COCA-COLA_LAN102
         routing_zone: COCA-COLA
-        vn_id: 30112
+        vlan_id: 102
+        vn_id: 110102
         ipv4_enabled: False
         create_policy_untagged: True
         bound_to:
         - system: Leaf1
         - system: Leaf2
     
+      - name: PEPSI_LAN200
+        routing_zone: PEPSI
+        vlan_id: 200
+        vn_id: 220200
+        create_policy_untagged: True
+        create_policy_tagged: True
+        ipv4_enabled: True
+        ipv4_subnet: 192.168.200.0/24
+        virtual_gateway_ipv4: 192.168.200.1
+        bound_to:
+        - system: Leaf1
+        - system: Leaf2
+      - name: PEPSI_LAN201
+        routing_zone: PEPSI
+        vlan_id: 201
+        vn_id: 220201
+        create_policy_untagged: True
+        create_policy_tagged: True
+        ipv4_enabled: True
+        ipv4_subnet: 192.168.201.0/24
+        virtual_gateway_ipv4: 192.168.201.1
+        bound_to:
+        - system: Leaf1
+        - system: Leaf2
+      - name: PEPSI_LAN202
+        routing_zone: PEPSI
+        vlan_id: 202
+        vn_id: 220202
+        ipv4_enabled: False
+        create_policy_untagged: True
+        bound_to:
+        - system: Leaf1
+        - system: Leaf2
+
+
     nodes:
-      - name: Server1
+      - name: COLA-VPC100.11
+        tags: [COLA]
+        external: false
+        links:
+        - ifname: eth0
+          switch: Leaf1
+          switch_port: ge-0/0/0
+          ct: "Untagged VxLAN 'COCA-COLA_LAN100'"
+      - name: COLA-VPC101.11
+        tags: [COLA]
+        external: false
+        links:
+        - ifname: eth0
+          switch: Leaf1
+          switch_port: ge-0/0/1
+          ct: "Untagged VxLAN 'COCA-COLA_LAN101'"
+      - name: COLA-VPC100.22
+        tags: [COLA]
+        external: false
+        links:
+        - ifname: eth0
+          switch: Leaf2
+          switch_port: ge-0/0/0
+          ct: "Untagged VxLAN 'COCA-COLA_LAN100'"
+      - name: COLA-VPC101.22
+        tags: [COLA]
+        external: false
+        links:
+        - ifname: eth0
+          switch: Leaf2
+          switch_port: ge-0/0/1
+          ct: "Untagged VxLAN 'COCA-COLA_LAN101'"
+      - name: COLA-VyOS.100
+        tags: [COLA]
+        external: false
+        links:
+        - ifname: eth0
+          switch: Leaf1
+          switch_port: ge-0/0/9
+          ct: ["Tagged VxLAN 'COCA-COLA_LAN100'", "Tagged VxLAN 'COCA-COLA_LAN101'" ]
+          lag: lag0
+        - ifname: eth1
+          switch: Leaf2
+          switch_port: ge-0/0/9
+          ct: ["Tagged VxLAN 'COCA-COLA_LAN100'", "Tagged VxLAN 'COCA-COLA_LAN101'" ]
+          lag: lag0
+
+
+
+      - name: PEPS-VPC200.11
+        tags: [PEPSI]
+        external: false
+        links:
+        - ifname: eth0
+          switch: Leaf1
+          switch_port: ge-0/1/0
+          ct: "Untagged VxLAN 'PEPSI_LAN200'"
+      - name: PEPS-VPC201.11
+        tags: [PEPSI]
         external: false
         links:
         - ifname: eth0
           switch: Leaf1
           switch_port: ge-0/1/1
-          ct: "Untagged VxLAN 'COCA-COLA_LAN110'"
+          ct: "Untagged VxLAN 'PEPSI_LAN201'"
+      - name: PEPS-VPC200.22
+        tags: [PEPSI]
+        external: false
+        links:
+        - ifname: eth0
+          switch: Leaf2
+          switch_port: ge-0/1/0
+          ct: "Untagged VxLAN 'PEPSI_LAN200'"
+      - name: PEPS-VPC201.22
+        tags: [PEPSI]
+        external: false
+        links:
+        - ifname: eth0
+          switch: Leaf2
+          switch_port: ge-0/1/1
+          ct: "Untagged VxLAN 'PEPSI_LAN201'"
+
+      - name: PEPS-VyOS.200
+        tags: [PEPSI]
+        external: false
+        links:
+        - ifname: eth0
+          switch: Leaf1
+          switch_port: ge-0/1/9
+          ct: ["Tagged VxLAN 'PEPSI_LAN200'", "Tagged VxLAN 'PEPSI_LAN201'" ]
+          lag: lag0
+        - ifname: eth1
+          switch: Leaf2
+          switch_port: ge-0/1/9
+          ct: ["Tagged VxLAN 'PEPSI_LAN200'", "Tagged VxLAN 'PEPSI_LAN201'" ]
+          lag: lag0
