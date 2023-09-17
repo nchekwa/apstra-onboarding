@@ -146,7 +146,7 @@ class VirtualNetworks:
         virtual_network = from_dict(data_class=VirtualNetwork, data=reponse_data)
         return(virtual_network)
 
-    def get_by_id(self, vn_id: str) -> VirtualNetwork|None:
+    def get_by_id(self, vn_id: str) -> Union[VirtualNetwork,None]:
         reponse_data = self.apstra.rest.get_json_response(f"/api/blueprints/{self.parameters.active_bp.id}/virtual-networks/{vn_id}")
         reponse = from_dict(data_class=VirtualNetwork, data=reponse_data)
         return(reponse)

@@ -5,7 +5,7 @@ logger = logging.getLogger(__name__)
 
 from pprint import pprint
 from collections import namedtuple
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Union
 from time import sleep
 
 from apstra.errors import ErrorApstraAPI
@@ -77,7 +77,7 @@ class Nodes:
             
         return(r)
     
-    def get_node_interfaces(self, server: str = None,  bp_id = None) -> List|Dict:
+    def get_node_interfaces(self, server: str = None,  bp_id = None) -> Union[List, Dict]:
         if bp_id is None:
             bp_id = self.parameters.active_bp.id
         devices = dict()

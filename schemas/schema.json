@@ -8,7 +8,7 @@
             "type": "object",
             "additionalProperties": false,
             "patternProperties": {
-                "^[a-zA-Z0-9_\\s]+$": {
+                "^[a-zA-Z0-9-_\\s]+$": {
                     "$ref": "def_blueprint.json#/definitions/BlueprintDef"
                 }
             },

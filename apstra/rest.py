@@ -179,7 +179,7 @@ class Rest:
         filtered = self.find_by(data, key, value)
         return (filtered)
 
-    def search_object(self, value = str, key = "label", uri=None) -> Tuple|None:
+    def search_object(self, value = str, key = "label", uri=None) -> Union[Tuple, None]:
         if uri is None:
             return[]
         data = self.apstra.rest.get_json_response(uri)

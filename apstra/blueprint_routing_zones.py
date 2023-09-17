@@ -98,7 +98,7 @@ class RoutingZones:
         routing_zone = from_dict(data_class=RoutingZone, data=reponse_data)
         return(routing_zone)
 
-    def get_by_id(self, rz_id: str) -> RoutingZone|None:
+    def get_by_id(self, rz_id: str) -> Union[RoutingZone,None]:
         reponse_data = self.apstra.rest.get_json_response(f"/api/blueprints/{self.parameters.active_bp.id}/security-zones/{rz_id}")
         reponse = from_dict(data_class=RoutingZone, data=reponse_data)
         return(reponse)
